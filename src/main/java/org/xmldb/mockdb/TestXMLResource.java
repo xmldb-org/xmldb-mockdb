@@ -10,9 +10,13 @@
  */
 package org.xmldb.mockdb;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.xmldb.api.base.ErrorCodes.NOT_IMPLEMENTED;
+import static org.xmldb.api.base.ErrorCodes.VENDOR_ERROR;
 
+import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
 import org.w3c.dom.Node;
@@ -34,6 +38,8 @@ import org.xmldb.api.modules.XMLResource;
  * and interaction but does not currently implement its content-handling methods.
  */
 public class TestXMLResource extends TestBaseResource<String> implements XMLResource {
+  private String content;
+
   /**
    * Constructs a new instance of TestXMLResource with the specified identifier and parent
    * collection.
@@ -58,22 +64,26 @@ public class TestXMLResource extends TestBaseResource<String> implements XMLReso
 
   @Override
   public void getContentAsStream(OutputStream stream) throws XMLDBException {
-    throw new XMLDBException(NOT_IMPLEMENTED);
+    try {
+      stream.write(content.getBytes(UTF_8));
+    } catch (IOException e) {
+      throw new XMLDBException(VENDOR_ERROR, e);
+    }
   }
 
   @Override
-  public String getContent() throws XMLDBException {
-    throw new XMLDBException(NOT_IMPLEMENTED);
+  public String getContent() {
+    return content;
   }
 
   @Override
-  public void setContent(String value) throws XMLDBException {
-    throw new XMLDBException(NOT_IMPLEMENTED);
+  public void setContent(String value) {
+    content = value;
   }
 
   @Override
-  public String getDocumentId() throws XMLDBException {
-    throw new XMLDBException(NOT_IMPLEMENTED);
+  public String getDocumentId() {
+    return getId();
   }
 
   @Override

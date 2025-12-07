@@ -10,10 +10,12 @@
  */
 package org.xmldb.mockdb;
 
-import static org.xmldb.api.base.ErrorCodes.NOT_IMPLEMENTED;
+import static org.xmldb.api.base.ErrorCodes.*;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.time.Instant;
+import java.util.Arrays;
 
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.XMLDBException;
@@ -29,6 +31,8 @@ import org.xmldb.api.modules.BinaryResource;
  * exceptions to indicate unimplemented functionality.
  */
 public class TestBinaryResource extends TestBaseResource<byte[]> implements BinaryResource {
+  private byte[] content;
+
   /**
    * Constructs a new {@code TestBinaryResource} with the specified identifier and parent
    * collection.
@@ -59,16 +63,20 @@ public class TestBinaryResource extends TestBaseResource<byte[]> implements Bina
 
   @Override
   public void getContentAsStream(OutputStream stream) throws XMLDBException {
-    throw new XMLDBException(NOT_IMPLEMENTED);
+    try {
+      stream.write(content);
+    } catch (IOException e) {
+      throw new XMLDBException(VENDOR_ERROR, e);
+    }
   }
 
   @Override
-  public byte[] getContent() throws XMLDBException {
-    throw new XMLDBException(NOT_IMPLEMENTED);
+  public byte[] getContent() {
+    return Arrays.copyOf(content, content.length);
   }
 
   @Override
-  public void setContent(byte[] value) throws XMLDBException {
-    throw new XMLDBException(NOT_IMPLEMENTED);
+  public void setContent(byte[] value) {
+    content = Arrays.copyOf(value, value.length);
   }
 }
