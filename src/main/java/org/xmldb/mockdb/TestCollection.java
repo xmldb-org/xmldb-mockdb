@@ -89,7 +89,7 @@ public class TestCollection extends ConfigurableImpl implements Collection {
    * @return The newly created and added resource.
    */
   public <T, R extends TestBaseResource<T>> R addResource(String id,
-      BiFunction<String, Collection, R> createAction) {
+      BiFunction<String, TestCollection, R> createAction) {
     if (id == null || id.isBlank()) {
       id = createId();
     }
@@ -204,7 +204,12 @@ public class TestCollection extends ConfigurableImpl implements Collection {
 
   @Override
   public void removeResource(Resource<?> res) throws XMLDBException {
-    resources.remove(res.getId());
+    final Resource<?> resource = resources.remove(res.getId());
+    if (resource == null) {
+      throw new XMLDBException(INVALID_RESOURCE, "Resource not found: " + res.getId());
+    } else {
+      resource.close();
+    }
   }
 
   @Override
