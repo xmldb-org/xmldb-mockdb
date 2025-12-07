@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
@@ -89,6 +90,9 @@ public class TestCollection extends ConfigurableImpl implements Collection {
    */
   public <T, R extends TestBaseResource<T>> R addResource(String id,
       BiFunction<String, Collection, R> createAction) {
+    if (id == null || id.isBlank()) {
+      id = createId();
+    }
     R resource = createAction.apply(id, this);
     resources.put(resource.getId(), resource);
     return resource;
@@ -214,8 +218,8 @@ public class TestCollection extends ConfigurableImpl implements Collection {
   }
 
   @Override
-  public String createId() throws XMLDBException {
-    throw new XMLDBException(NOT_IMPLEMENTED);
+  public String createId() {
+    return UUID.randomUUID().toString();
   }
 
   @Override
