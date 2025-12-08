@@ -78,5 +78,6 @@ public class TestBinaryResource extends TestBaseResource<byte[]> implements Bina
   @Override
   public void setContent(byte[] value) {
     content = Arrays.copyOf(value, value.length);
+    updateLastChange();
   }
 }

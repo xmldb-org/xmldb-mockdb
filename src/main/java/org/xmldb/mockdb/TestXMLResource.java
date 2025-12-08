@@ -16,7 +16,6 @@ import static org.xmldb.api.base.ErrorCodes.VENDOR_ERROR;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
 import org.w3c.dom.Node;
@@ -79,6 +78,7 @@ public class TestXMLResource extends TestBaseResource<String> implements XMLReso
   @Override
   public void setContent(String value) {
     content = value;
+    updateLastChange();
   }
 
   @Override
