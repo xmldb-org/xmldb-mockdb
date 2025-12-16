@@ -31,9 +31,18 @@ repositories {
   maven { url = 'https://central.sonatype.com/repository/maven-snapshots/' }
 }
 
+configurations {
+  tckTests {
+    canBeConsumed = false
+    canBeResolved = true
+    extendsFrom testImplementation, testRuntimeOnly
+  }
+}
+
 dependencies {
   implementation 'net.sf.xmldb-org:xmldb-api:3.0.0-SNAPSHOT'
 
+  tckTests  'net.sf.xmldb-org:xmldb-api-tck:0.1.0-SNAPSHOT'
   errorprone 'com.google.errorprone:error_prone_core:2.42.0'
 
   testImplementation 'org.assertj:assertj-core:3.27.6'
@@ -42,6 +51,7 @@ dependencies {
   testImplementation 'org.mockito:mockito-junit-jupiter:5.20.0'
 
   testRuntimeOnly 'org.mockito:mockito-core:5.20.0'
+  testRuntimeOnly 'org.junit.platform:junit-platform-console:6.0.1'
   testRuntimeOnly 'org.junit.platform:junit-platform-runner:1.14.1'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:6.0.1'
 }
@@ -61,6 +71,18 @@ jar {
 
 tasks.withType(JavaCompile).configureEach {
   dependsOn 'spotlessJavaApply'
+}
+
+tasks.register('runTck', JavaExec) {
+  group = 'verification'
+  description = 'Runs the TCK tests from the tck source set (for TCK authors)'
+  mainClass = 'org.junit.platform.console.ConsoleLauncher'
+  classpath = files(configurations.tckTests, sourceSets.test.runtimeClasspath)
+  args    'execute',
+          '--details=tree',
+          '--select-package=org.xmldb.tck.tests',
+          '--reports-dir',
+          "${layout.buildDirectory.dir('tck-reports').get().getAsFile()}"
 }
 
 spotless {

@@ -88,6 +88,7 @@ public class TestDatabase extends ConfigurableImpl implements Database {
       this.name = name;
     }
     collections = new HashMap<>();
+    addCollection("db");
   }
 
   private String sanitizePath(final String path) {
