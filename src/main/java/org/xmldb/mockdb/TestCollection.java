@@ -42,7 +42,7 @@ import org.xmldb.api.modules.XMLResource;
 public class TestCollection extends ConfigurableImpl implements Collection {
   private final TestCollectionData data;
   private final TestCollection parentCollection;
-  private final ConcurrentMap<String, Resource<?>> resources;
+  private final ConcurrentMap<String, Resource> resources;
 
   private boolean closed;
 
@@ -81,14 +81,13 @@ public class TestCollection extends ConfigurableImpl implements Collection {
   /**
    * Adds a new resource to the collection using the specified creation action.
    *
-   * @param <T> The type of data the resource holds.
    * @param <R> The type of resource, which must extend TestBaseResource.
    * @param id The unique identifier for the resource to be added.
    * @param createAction A function that creates a resource using its identifier and the current
    *        collection.
    * @return The newly created and added resource.
    */
-  public <T, R extends TestBaseResource<T>> R addResource(String id,
+  public <R extends TestBaseResource> R addResource(String id,
       BiFunction<String, TestCollection, R> createAction) {
     if (id == null || id.isBlank()) {
       id = createId();
@@ -192,8 +191,7 @@ public class TestCollection extends ConfigurableImpl implements Collection {
   }
 
   @Override
-  public <T, R extends Resource<T>> R createResource(String id, Class<R> type)
-      throws XMLDBException {
+  public <R extends Resource> R createResource(String id, Class<R> type) throws XMLDBException {
     if (BinaryResource.class.equals(type)) {
       return type.cast(new TestBinaryResource(id, this));
     } else if (XMLResource.class.equals(type)) {
@@ -203,8 +201,8 @@ public class TestCollection extends ConfigurableImpl implements Collection {
   }
 
   @Override
-  public void removeResource(Resource<?> res) throws XMLDBException {
-    final Resource<?> resource = resources.remove(res.getId());
+  public void removeResource(Resource res) throws XMLDBException {
+    final Resource resource = resources.remove(res.getId());
     if (resource == null) {
       throw new XMLDBException(INVALID_RESOURCE, "Resource not found: " + res.getId());
     } else {
@@ -213,12 +211,12 @@ public class TestCollection extends ConfigurableImpl implements Collection {
   }
 
   @Override
-  public void storeResource(Resource<?> res) throws XMLDBException {
+  public void storeResource(Resource res) throws XMLDBException {
     resources.put(res.getId(), res);
   }
 
   @Override
-  public Resource<?> getResource(String id) {
+  public Resource getResource(String id) {
     return resources.get(id);
   }
 

@@ -21,10 +21,8 @@ import org.xmldb.api.base.Resource;
  * <p>
  * This class encapsulates basic metadata about a resource, such as its identifier, creation time,
  * last modification time, and parent collection.
- *
- * @param <T> the type of content that this resource manages.
  */
-public abstract class TestBaseResource<T> implements Resource<T> {
+public abstract class TestBaseResource implements Resource {
   private final String id;
   private final Collection parentCollection;
   private final Instant creation;

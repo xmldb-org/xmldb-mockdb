@@ -12,7 +12,9 @@ package org.xmldb.mockdb;
 
 import static org.xmldb.api.base.ErrorCodes.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.Instant;
 import java.util.Arrays;
@@ -30,7 +32,7 @@ import org.xmldb.api.modules.BinaryResource;
  * However, for this implementation, the functionality of these methods is not provided and throws
  * exceptions to indicate unimplemented functionality.
  */
-public class TestBinaryResource extends TestBaseResource<byte[]> implements BinaryResource {
+public class TestBinaryResource extends TestBaseResource implements BinaryResource {
   private byte[] content;
 
   /**
@@ -71,13 +73,27 @@ public class TestBinaryResource extends TestBaseResource<byte[]> implements Bina
   }
 
   @Override
-  public byte[] getContent() {
+  public void setContentAsStream(InputStream inputStream) throws XMLDBException {
+    try (inputStream; ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+      inputStream.transferTo(outputStream);
+      this.content = outputStream.toByteArray();
+    } catch (IOException e) {
+      throw new XMLDBException(VENDOR_ERROR, e);
+    }
+  }
+
+  @Override
+  public Object getContent() {
     return Arrays.copyOf(content, content.length);
   }
 
   @Override
-  public void setContent(byte[] value) {
-    content = Arrays.copyOf(value, value.length);
-    updateLastChange();
+  public void setContent(Object value) throws XMLDBException {
+    if (value instanceof byte[] bytes) {
+      content = Arrays.copyOf(bytes, bytes.length);
+      updateLastChange();
+    } else {
+      throw new XMLDBException(VENDOR_ERROR, "Content must be of type byte[]");
+    }
   }
 }

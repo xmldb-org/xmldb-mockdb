@@ -11,10 +11,12 @@
 package org.xmldb.mockdb;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.xmldb.api.base.ErrorCodes.*;
 import static org.xmldb.api.base.ErrorCodes.NOT_IMPLEMENTED;
-import static org.xmldb.api.base.ErrorCodes.VENDOR_ERROR;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.Instant;
 
@@ -36,7 +38,7 @@ import org.xmldb.api.modules.XMLResource;
  * associated with a parent collection. The class includes functionality for managing XML content
  * and interaction but does not currently implement its content-handling methods.
  */
-public class TestXMLResource extends TestBaseResource<String> implements XMLResource {
+public class TestXMLResource extends TestBaseResource implements XMLResource {
   private String content;
 
   /**
@@ -71,14 +73,28 @@ public class TestXMLResource extends TestBaseResource<String> implements XMLReso
   }
 
   @Override
-  public String getContent() {
+  public void setContentAsStream(InputStream inputStream) throws XMLDBException {
+    try (inputStream; ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+      inputStream.transferTo(outputStream);
+      this.content = outputStream.toString(UTF_8);
+    } catch (IOException e) {
+      throw new XMLDBException(VENDOR_ERROR, e);
+    }
+  }
+
+  @Override
+  public Object getContent() {
     return content;
   }
 
   @Override
-  public void setContent(String value) {
-    content = value;
-    updateLastChange();
+  public void setContent(Object value) throws XMLDBException {
+    if (value instanceof String stringValue) {
+      content = stringValue;
+      updateLastChange();
+    } else {
+      throw new XMLDBException(VENDOR_ERROR, "Content must be of type String");
+    }
   }
 
   @Override
