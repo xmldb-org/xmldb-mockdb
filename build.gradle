@@ -14,7 +14,7 @@ plugins {
   id 'maven-publish'
   id 'signing'
   id 'com.diffplug.spotless' version '8.1.0'
-  id 'io.quarkus' version '3.30.0'
+  id 'io.quarkus' version '3.30.3'
   id 'net.ltgt.errorprone' version '4.3.0'
 }
 
@@ -43,14 +43,14 @@ dependencies {
   implementation 'net.sf.xmldb-org:xmldb-api:3.0.0-SNAPSHOT'
 
   tckTests  'net.sf.xmldb-org:xmldb-api-tck:0.1.0-SNAPSHOT'
-  errorprone 'com.google.errorprone:error_prone_core:2.42.0'
+  errorprone 'com.google.errorprone:error_prone_core:2.45.0'
 
   testImplementation 'org.assertj:assertj-core:3.27.6'
   testImplementation 'org.junit.jupiter:junit-jupiter-params:6.0.1'
-  testImplementation 'org.mockito:mockito-core:5.20.0'
-  testImplementation 'org.mockito:mockito-junit-jupiter:5.20.0'
+  testImplementation 'org.mockito:mockito-core:5.21.0'
+  testImplementation 'org.mockito:mockito-junit-jupiter:5.21.0'
 
-  testRuntimeOnly 'org.mockito:mockito-core:5.20.0'
+  testRuntimeOnly 'org.mockito:mockito-core:5.21.0'
   testRuntimeOnly 'org.junit.platform:junit-platform-console:6.0.1'
   testRuntimeOnly 'org.junit.platform:junit-platform-runner:1.14.1'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:6.0.1'
