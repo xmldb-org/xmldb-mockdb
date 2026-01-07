@@ -14,7 +14,7 @@ plugins {
   id 'maven-publish'
   id 'signing'
   id 'com.diffplug.spotless' version '8.1.0'
-  id 'io.quarkus' version '3.30.5'
+  id 'io.quarkus' version '3.30.6'
   id 'net.ltgt.errorprone' version '4.3.0'
 }
 
