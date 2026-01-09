@@ -15,7 +15,7 @@ plugins {
   id 'signing'
   id 'com.diffplug.spotless' version '8.1.0'
   id 'io.quarkus' version '3.30.6'
-  id 'net.ltgt.errorprone' version '4.3.0'
+  id 'net.ltgt.errorprone' version '4.4.0'
 }
 
 group = 'net.sf.xmldb-org'
@@ -43,7 +43,7 @@ dependencies {
   implementation 'net.sf.xmldb-org:xmldb-api:3.0.0-SNAPSHOT'
 
   tckTests  'net.sf.xmldb-org:xmldb-api-tck:0.1.0-SNAPSHOT'
-  errorprone 'com.google.errorprone:error_prone_core:2.45.0'
+  errorprone 'com.google.errorprone:error_prone_core:2.46.0'
 
   testImplementation 'org.assertj:assertj-core:3.27.6'
   testImplementation 'org.junit.jupiter:junit-jupiter-params:6.0.2'
