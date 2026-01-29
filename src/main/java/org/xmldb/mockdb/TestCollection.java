@@ -11,7 +11,6 @@
 package org.xmldb.mockdb;
 
 import static org.xmldb.api.base.ErrorCodes.INVALID_RESOURCE;
-import static org.xmldb.api.base.ErrorCodes.NOT_IMPLEMENTED;
 
 import java.time.Instant;
 import java.util.List;
@@ -26,9 +25,26 @@ import java.util.function.Consumer;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Resource;
 import org.xmldb.api.base.Service;
+import org.xmldb.api.base.ServiceProviderCache;
 import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.modules.BinaryResource;
+import org.xmldb.api.modules.CollectionManagementService;
+import org.xmldb.api.modules.DatabaseInstanceService;
+import org.xmldb.api.modules.TransactionService;
 import org.xmldb.api.modules.XMLResource;
+import org.xmldb.api.modules.XPathQueryService;
+import org.xmldb.api.modules.XQueryService;
+import org.xmldb.api.modules.XUpdateQueryService;
+import org.xmldb.api.security.PermissionManagementService;
+import org.xmldb.api.security.UserPrincipalLookupService;
+import org.xmldb.mockdb.services.TestCollectionManagementService;
+import org.xmldb.mockdb.services.TestDatabaseInstanceService;
+import org.xmldb.mockdb.services.TestPermissionManagementService;
+import org.xmldb.mockdb.services.TestTransactionService;
+import org.xmldb.mockdb.services.TestUserPrincipalLookupService;
+import org.xmldb.mockdb.services.TestXPathQueryService;
+import org.xmldb.mockdb.services.TestXQueryService;
+import org.xmldb.mockdb.services.TestXUpdateQueryService;
 
 /**
  * The TestCollection class represents a collection of resources and child collections
@@ -43,6 +59,8 @@ public class TestCollection extends ConfigurableImpl implements Collection {
   private final TestCollectionData data;
   private final TestCollection parentCollection;
   private final ConcurrentMap<String, Resource> resources;
+  private final ServiceProviderCache serviceProviderCache =
+      ServiceProviderCache.withRegistered(this::registerProviders);
 
   private boolean closed;
 
@@ -57,6 +75,19 @@ public class TestCollection extends ConfigurableImpl implements Collection {
     this.data = data;
     this.parentCollection = parent;
     resources = new ConcurrentHashMap<>();
+  }
+
+  final void registerProviders(ServiceProviderCache.ProviderRegistry reg) {
+    // modules
+    reg.add(CollectionManagementService.class, () -> new TestCollectionManagementService(this));
+    reg.add(DatabaseInstanceService.class, () -> new TestDatabaseInstanceService(this));
+    reg.add(TransactionService.class, () -> new TestTransactionService(this));
+    reg.add(XPathQueryService.class, () -> new TestXPathQueryService(this));
+    reg.add(XQueryService.class, () -> new TestXQueryService(this));
+    reg.add(XUpdateQueryService.class, () -> new TestXUpdateQueryService(this));
+    // security
+    reg.add(PermissionManagementService.class, () -> new TestPermissionManagementService(this));
+    reg.add(UserPrincipalLookupService.class, () -> new TestUserPrincipalLookupService(this));
   }
 
   /**
@@ -147,17 +178,12 @@ public class TestCollection extends ConfigurableImpl implements Collection {
 
   @Override
   public <S extends Service> boolean hasService(Class<S> serviceType) {
-    return false;
+    return serviceProviderCache.hasService(serviceType);
   }
 
   @Override
   public <S extends Service> Optional<S> findService(Class<S> serviceType) {
-    return Optional.empty();
-  }
-
-  @Override
-  public <S extends Service> S getService(Class<S> serviceType) throws XMLDBException {
-    throw new XMLDBException(NOT_IMPLEMENTED);
+    return serviceProviderCache.findService(serviceType);
   }
 
   @Override
@@ -192,6 +218,9 @@ public class TestCollection extends ConfigurableImpl implements Collection {
 
   @Override
   public <R extends Resource> R createResource(String id, Class<R> type) throws XMLDBException {
+    if (id == null || id.isBlank()) {
+      id = createId();
+    }
     if (BinaryResource.class.equals(type)) {
       return type.cast(new TestBinaryResource(id, this));
     } else if (XMLResource.class.equals(type)) {
