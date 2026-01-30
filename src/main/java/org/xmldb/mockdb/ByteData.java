@@ -12,27 +12,39 @@ package org.xmldb.mockdb;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.time.Instant;
 
 import org.xmldb.api.base.Resource;
 import org.xmldb.api.base.XMLDBException;
 
 final class ByteData {
-  private Class<? extends Resource> type;
-  private byte[] content;
+  private final Class<? extends Resource> type;
+  private final Instant creation;
+  private final Instant lastChange;
+  private final byte[] content;
 
   ByteData(Resource resource) throws XMLDBException {
     type = resource.getClass();
+    creation = resource.getCreationTime();
+    lastChange = resource.getLastModificationTime();
     ByteArrayOutputStream dataConsumer = new ByteArrayOutputStream();
     resource.getContentAsStream(dataConsumer);
     content = dataConsumer.toByteArray();
   }
 
-  private Resource setContent(Resource resource) throws XMLDBException {
+  private Resource setContent(TestBaseResource resource) throws XMLDBException {
     resource.setContentAsStream(new ByteArrayInputStream(content));
+    resource.setLastChange(lastChange);
     return resource;
   }
 
   Resource createResource(String id, TestCollection testCollection) throws XMLDBException {
-    return setContent(testCollection.createResource(id, type));
+    return setContent(testCollection.createResource(id, type, creation));
+  }
+
+  @Override
+  public String toString() {
+    return "ByteData(creation=%s, lastChange=%s, content.length=%d)".formatted(creation, lastChange,
+        content.length);
   }
 }

@@ -129,6 +129,19 @@ public class TestCollection extends ConfigurableImpl implements Collection {
     return resource;
   }
 
+  public TestBaseResource createResource(String id, Class<?> type, Instant creation)
+      throws XMLDBException {
+    if (id == null || id.isBlank()) {
+      id = createId();
+    }
+    if (type.isAssignableFrom(BinaryResource.class)) {
+      return new TestBinaryResource(id, creation, this);
+    } else if (type.isAssignableFrom(XMLResource.class)) {
+      return new TestXMLResource(id, creation, this);
+    }
+    throw new XMLDBException(INVALID_RESOURCE);
+  }
+
   /**
    * Adds a child collection to the current collection.
    *
@@ -219,15 +232,7 @@ public class TestCollection extends ConfigurableImpl implements Collection {
 
   @Override
   public <R extends Resource> R createResource(String id, Class<R> type) throws XMLDBException {
-    if (id == null || id.isBlank()) {
-      id = createId();
-    }
-    if (type.isAssignableFrom(BinaryResource.class)) {
-      return type.cast(new TestBinaryResource(id, this));
-    } else if (type.isAssignableFrom(XMLResource.class)) {
-      return type.cast(new TestXMLResource(id, this));
-    }
-    throw new XMLDBException(INVALID_RESOURCE);
+    return type.cast(createResource(id, type, Instant.now()));
   }
 
   @Override

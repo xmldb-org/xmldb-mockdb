@@ -54,8 +54,17 @@ public abstract class TestBaseResource implements Resource {
    * This method sets the {@code lastChange} property to the current system time, effectively
    * marking the resource as having been modified.
    */
-  protected void updateLastChange() {
-    lastChange = Instant.now();
+  protected final void updateLastChange() {
+    setLastChange(Instant.now());
+  }
+
+  /**
+   * Sets the last modification time of the resource.
+   *
+   * @param lastChange the {@code Instant} representing the timestamp of the last modification.
+   */
+  protected final void setLastChange(Instant lastChange) {
+    this.lastChange = lastChange;
   }
 
   @Override
