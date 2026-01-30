@@ -36,14 +36,6 @@ import org.xmldb.api.modules.XQueryService;
 import org.xmldb.api.modules.XUpdateQueryService;
 import org.xmldb.api.security.PermissionManagementService;
 import org.xmldb.api.security.UserPrincipalLookupService;
-import org.xmldb.mockdb.services.TestCollectionManagementService;
-import org.xmldb.mockdb.services.TestDatabaseInstanceService;
-import org.xmldb.mockdb.services.TestPermissionManagementService;
-import org.xmldb.mockdb.services.TestTransactionService;
-import org.xmldb.mockdb.services.TestUserPrincipalLookupService;
-import org.xmldb.mockdb.services.TestXPathQueryService;
-import org.xmldb.mockdb.services.TestXQueryService;
-import org.xmldb.mockdb.services.TestXUpdateQueryService;
 
 /**
  * The TestCollection class represents a collection of resources and child collections
@@ -106,10 +98,13 @@ public class TestCollection extends ConfigurableImpl implements Collection {
     return resource;
   }
 
-  public TestBaseResource createResource(String id, Class<?> type, Instant creation)
+  TestBaseResource createResource(String id, Class<?> type, Instant creation)
       throws XMLDBException {
     if (id == null || id.isBlank()) {
       id = createId();
+    }
+    if (creation == null) {
+      creation = Instant.now();
     }
     if (type.isAssignableFrom(BinaryResource.class)) {
       return new TestBinaryResource(id, creation, this);
@@ -203,7 +198,7 @@ public class TestCollection extends ConfigurableImpl implements Collection {
 
   @Override
   public <R extends Resource> R createResource(String id, Class<R> type) throws XMLDBException {
-    return type.cast(createResource(id, type, Instant.now()));
+    return type.cast(createResource(id, type, null));
   }
 
   @Override

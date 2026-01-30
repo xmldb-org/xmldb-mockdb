@@ -8,25 +8,24 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.xmldb.mockdb.services;
+package org.xmldb.mockdb;
 
-import org.xmldb.api.base.ResourceSet;
+import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.XMLDBException;
-import org.xmldb.api.modules.XPathQueryService;
-import org.xmldb.mockdb.TestCollection;
+import org.xmldb.api.modules.XUpdateQueryService;
 
-public class TestXPathQueryService extends BaseQueryService implements XPathQueryService {
-  public TestXPathQueryService(TestCollection collection) {
-    super(new ServiceInfo("XPathQueryService", "1.0"), collection);
+class TestXUpdateQueryService extends BaseService implements XUpdateQueryService {
+  TestXUpdateQueryService(TestCollection collection) {
+    super(new ServiceInfo("XUpdateQueryService", "1.0"), collection);
   }
 
   @Override
-  public ResourceSet query(String query) throws XMLDBException {
-    return null;
+  public long update(String commands) throws XMLDBException {
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
-  public ResourceSet queryResource(String id, String query) throws XMLDBException {
-    return null;
+  public long updateResource(String id, String commands) throws XMLDBException {
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 }

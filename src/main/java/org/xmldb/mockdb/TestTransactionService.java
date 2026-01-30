@@ -8,23 +8,29 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.xmldb.mockdb.services;
+package org.xmldb.mockdb;
 
+import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.modules.TransactionService;
-import org.xmldb.mockdb.TestCollection;
 
-public class TestTransactionService extends BaseService implements TransactionService {
-  public TestTransactionService(TestCollection collection) {
+class TestTransactionService extends BaseService implements TransactionService {
+  TestTransactionService(TestCollection collection) {
     super(new ServiceInfo("TransactionService", "1.0"), collection);
   }
 
   @Override
-  public void begin() throws XMLDBException {}
+  public void begin() throws XMLDBException {
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
+  }
 
   @Override
-  public void commit() throws XMLDBException {}
+  public void commit() throws XMLDBException {
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
+  }
 
   @Override
-  public void rollback() throws XMLDBException {}
+  public void rollback() throws XMLDBException {
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
+  }
 }

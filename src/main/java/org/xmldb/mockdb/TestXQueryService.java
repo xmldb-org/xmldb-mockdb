@@ -8,45 +8,51 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.xmldb.mockdb.services;
+package org.xmldb.mockdb;
 
 import org.xmldb.api.base.CompiledExpression;
+import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.ResourceSet;
 import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.modules.XQueryService;
-import org.xmldb.mockdb.TestCollection;
 
-public class TestXQueryService extends BaseQueryService implements XQueryService {
-  public TestXQueryService(TestCollection collection) {
+class TestXQueryService extends BaseQueryService implements XQueryService {
+  TestXQueryService(TestCollection collection) {
     super(new ServiceInfo("XQueryService", "1.0"), collection);
   }
 
   @Override
   public ResourceSet query(String query) throws XMLDBException {
-    return null;
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
   public ResourceSet queryResource(String id, String query) throws XMLDBException {
-    return null;
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
   public CompiledExpression compile(String query) throws XMLDBException {
-    return null;
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
   public ResourceSet execute(CompiledExpression expression) throws XMLDBException {
-    return null;
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
-  public void declareVariable(String qname, Object initialValue) throws XMLDBException {}
+  public void declareVariable(String qname, Object initialValue) throws XMLDBException {
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
+  }
 
   @Override
-  public void setXPathCompatibility(boolean backwardsCompatible) {}
+  public void setXPathCompatibility(boolean backwardsCompatible) {
+    // no action
+  }
 
   @Override
-  public void setModuleLoadPath(String path) {}
+  public void setModuleLoadPath(String path) {
+    // no action
+  }
 }

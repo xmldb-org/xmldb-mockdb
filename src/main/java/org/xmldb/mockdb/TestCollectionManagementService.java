@@ -8,46 +8,47 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.xmldb.mockdb.services;
+package org.xmldb.mockdb;
 
 import org.xmldb.api.base.Collection;
+import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.modules.CollectionManagementService;
-import org.xmldb.mockdb.TestCollection;
 
-public class TestCollectionManagementService extends BaseService
-    implements CollectionManagementService {
-  public TestCollectionManagementService(TestCollection collection) {
+class TestCollectionManagementService extends BaseService implements CollectionManagementService {
+  TestCollectionManagementService(TestCollection collection) {
     super(new ServiceInfo("CollectionManagementService", "1.0"), collection);
   }
 
   @Override
   public Collection createCollection(String name) throws XMLDBException {
-    return null;
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
-  public void removeCollection(String name) throws XMLDBException {}
+  public void removeCollection(String name) throws XMLDBException {
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
+  }
 
   @Override
   public void move(String collection, String destination, String newName) throws XMLDBException {
-
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
   public void moveResource(String resourcePath, String destinationPath, String newName)
       throws XMLDBException {
-
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
   public void copyResource(String resourcePath, String destinationPath, String newName)
       throws XMLDBException {
-
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
   public void copy(String collection, String destination, String newName) throws XMLDBException {
-
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 }

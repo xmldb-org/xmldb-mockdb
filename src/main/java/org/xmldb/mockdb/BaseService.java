@@ -8,15 +8,22 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.xmldb.mockdb.services;
+package org.xmldb.mockdb;
 
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.Service;
 import org.xmldb.api.base.XMLDBException;
-import org.xmldb.mockdb.ConfigurableImpl;
-import org.xmldb.mockdb.TestCollection;
 
+/**
+ * BaseService provides a foundational abstract class for implementing various database services. It
+ * includes shared functionality for service metadata and management of collections associated with
+ * the service. This class extends ConfigurableImpl to allow configuration of service-specific
+ * properties.
+ * <p>
+ * Subclasses of BaseService are required to provide implementations for additional service-specific
+ * operations while inheriting the shared functionalities defined in this class.
+ */
 public abstract class BaseService extends ConfigurableImpl implements Service {
   private final ServiceInfo info;
 

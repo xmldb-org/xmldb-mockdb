@@ -8,12 +8,13 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.xmldb.mockdb.services;
+package org.xmldb.mockdb;
 
 import java.util.List;
 import java.util.Set;
 
 import org.xmldb.api.base.Collection;
+import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.Resource;
 import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.security.AclEntry;
@@ -22,22 +23,20 @@ import org.xmldb.api.security.GroupPrincipal;
 import org.xmldb.api.security.Permission;
 import org.xmldb.api.security.PermissionManagementService;
 import org.xmldb.api.security.UserPrincipal;
-import org.xmldb.mockdb.TestCollection;
 
-public class TestPermissionManagementService extends BaseService
-    implements PermissionManagementService {
-  public TestPermissionManagementService(TestCollection collection) {
+class TestPermissionManagementService extends BaseService implements PermissionManagementService {
+  TestPermissionManagementService(TestCollection collection) {
     super(new ServiceInfo("PermissionManagementService", "1.0"), collection);
   }
 
   @Override
   public Attributes getAttributes(Collection collection) throws XMLDBException {
-    return null;
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
   public Attributes getAttributes(Resource resource) throws XMLDBException {
-    return null;
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
@@ -47,7 +46,7 @@ public class TestPermissionManagementService extends BaseService
 
   @Override
   public void setPermissions(Collection collection, Set<Permission> perms) throws XMLDBException {
-
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
@@ -57,7 +56,7 @@ public class TestPermissionManagementService extends BaseService
 
   @Override
   public void setPermissions(Resource resource, Set<Permission> perms) throws XMLDBException {
-
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
@@ -67,7 +66,7 @@ public class TestPermissionManagementService extends BaseService
 
   @Override
   public void setAcl(Collection collection, List<AclEntry> aclEntries) throws XMLDBException {
-
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
@@ -77,46 +76,46 @@ public class TestPermissionManagementService extends BaseService
 
   @Override
   public void setAcl(Resource resource, List<AclEntry> aclEntries) throws XMLDBException {
-
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
   public UserPrincipal getOwner(Collection collection) throws XMLDBException {
-    return null;
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
   public void setOwner(Collection collection, UserPrincipal owner) throws XMLDBException {
-
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
   public UserPrincipal getOwner(Resource resource) throws XMLDBException {
-    return null;
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
   public void setOwner(Resource resource, UserPrincipal owner) throws XMLDBException {
-
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
   public GroupPrincipal getGroup(Collection collection) throws XMLDBException {
-    return null;
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
   public void setGroup(Collection collection, GroupPrincipal group) throws XMLDBException {
-
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
   public GroupPrincipal getGroup(Resource resource) throws XMLDBException {
-    return null;
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
   public void setGroup(Resource resource, GroupPrincipal group) throws XMLDBException {
-
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 }

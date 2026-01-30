@@ -8,11 +8,10 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.xmldb.mockdb.services;
+package org.xmldb.mockdb;
 
 import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.XMLDBException;
-import org.xmldb.mockdb.TestCollection;
 
 /**
  * This class extends {@link BaseService} to provide common remote service functionalities
@@ -23,8 +22,7 @@ import org.xmldb.mockdb.TestCollection;
  * removing namespace prefixes and URIs. These functionalities are useful for remote query execution
  * that relies on namespaces for XML data and query processing.
  */
-public class BaseQueryService extends BaseService {
-
+class BaseQueryService extends BaseService {
   BaseQueryService(ServiceInfo info, TestCollection collection) {
     super(info, collection);
   }

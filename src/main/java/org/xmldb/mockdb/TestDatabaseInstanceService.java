@@ -8,22 +8,26 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.xmldb.mockdb.services;
+package org.xmldb.mockdb;
 
+import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.modules.DatabaseInstanceService;
-import org.xmldb.mockdb.TestCollection;
 
-public class TestDatabaseInstanceService extends BaseService implements DatabaseInstanceService {
-  public TestDatabaseInstanceService(TestCollection collection) {
+class TestDatabaseInstanceService extends BaseService implements DatabaseInstanceService {
+  TestDatabaseInstanceService(TestCollection collection) {
     super(new ServiceInfo("DatabaseInstanceService", "1.0"), collection);
   }
 
   @Override
-  public void shutdown() throws XMLDBException {}
+  public void shutdown() throws XMLDBException {
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
+  }
 
   @Override
-  public void shutdown(long delay) throws XMLDBException {}
+  public void shutdown(long delay) throws XMLDBException {
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
+  }
 
   @Override
   public boolean isLocalInstance() {

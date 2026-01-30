@@ -8,27 +8,26 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.xmldb.mockdb.services;
+package org.xmldb.mockdb;
 
+import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.security.GroupPrincipal;
 import org.xmldb.api.security.UserPrincipal;
 import org.xmldb.api.security.UserPrincipalLookupService;
-import org.xmldb.mockdb.TestCollection;
 
-public class TestUserPrincipalLookupService extends BaseService
-    implements UserPrincipalLookupService {
-  public TestUserPrincipalLookupService(TestCollection collection) {
+class TestUserPrincipalLookupService extends BaseService implements UserPrincipalLookupService {
+  TestUserPrincipalLookupService(TestCollection collection) {
     super(new ServiceInfo("UserPrincipalLookupService", "1.0"), collection);
   }
 
   @Override
   public UserPrincipal lookupPrincipalByName(String name) throws XMLDBException {
-    return null;
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 
   @Override
   public GroupPrincipal lookupPrincipalByGroupName(String group) throws XMLDBException {
-    return null;
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
   }
 }
