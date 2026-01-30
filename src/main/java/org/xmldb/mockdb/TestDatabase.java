@@ -48,7 +48,7 @@ public class TestDatabase extends ConfigurableImpl implements Database {
   private static final Pattern COLLECTION_PATTERN = compile(COLLECTION_DELIMITER);
 
   private final String name;
-  private final Map<String, TestCollection> collections;
+  private final Map<String, TestCollectionData> collections;
   private final BiPredicate<String, String> authenticationCallback;
 
   /**
@@ -119,7 +119,7 @@ public class TestDatabase extends ConfigurableImpl implements Database {
    */
   public TestDatabase addCollection(String collectionName, Consumer<TestCollection> initializer) {
     final StringJoiner path = new StringJoiner(COLLECTION_DELIMITER);
-    final AtomicReference<TestCollection> parentCollection = new AtomicReference<>();
+    final AtomicReference<TestCollectionData> parentCollection = new AtomicReference<>();
     try (Stream<String> segmentStream = COLLECTION_PATTERN.splitAsStream(collectionName)) {
       segmentStream.filter(s -> !s.isBlank()).forEach(segment -> {
         path.add(segment);
@@ -130,21 +130,22 @@ public class TestDatabase extends ConfigurableImpl implements Database {
     return this;
   }
 
-  TestCollection createCollection(String name, TestCollection parent,
+  TestCollectionData createCollection(String name, TestCollectionData parent,
       Consumer<TestCollection> initializer) {
-    final TestCollection collection =
-        new TestCollection(new TestCollectionData(this, name), parent);
+    final TestCollectionData collectionData = new TestCollectionData(this, name, parent);
     if (initializer != null) {
-      initializer.accept(collection);
+      try (TestCollection collection = new TestCollection(collectionData)) {
+        initializer.accept(collection);
+      }
     }
-    return collection;
+    return collectionData;
   }
 
-  TestCollection getCollection(String collectionName) {
+  TestCollectionData getCollectionData(String collectionName) {
     return collections.get(sanitizePath(collectionName));
   }
 
-  Stream<Map.Entry<String, TestCollection>> collections() {
+  Stream<Map.Entry<String, TestCollectionData>> collections() {
     return collections.entrySet().stream();
   }
 
@@ -168,7 +169,10 @@ public class TestDatabase extends ConfigurableImpl implements Database {
       if (uri.startsWith(URI_PREFIX) && authenticationCallback.test(user, password)) {
         final URI dbUri = URI.create(uri.substring(URI_PREFIX.length()));
         if (name.equals(dbUri.getScheme())) {
-          return collections.get(sanitizePath(dbUri.getPath()));
+          final TestCollectionData collectionData = collections.get(sanitizePath(dbUri.getPath()));
+          if (collectionData != null) {
+            return new TestCollection(collectionData);
+          }
         }
         return null;
       }
@@ -189,5 +193,10 @@ public class TestDatabase extends ConfigurableImpl implements Database {
   @Override
   public String getConformanceLevel() {
     return "0";
+  }
+
+  @Override
+  public String toString() {
+    return "TestDatabase[name=%s]".formatted(name);
   }
 }

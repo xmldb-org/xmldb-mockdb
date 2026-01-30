@@ -33,7 +33,7 @@ class TestCollectionTest {
 
   @BeforeEach
   void setUp() {
-    collection = db.addCollection("db").getCollection("db");
+    collection = new TestCollection(db.addCollection("db").getCollectionData("/db"));
   }
 
   @Test

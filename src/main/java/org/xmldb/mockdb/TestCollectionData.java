@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -37,18 +38,20 @@ import org.xmldb.api.base.Collection;
  * @param name the name of the test collection, must not be null
  * @param creation the creation timestamp of the test collection, must not be null
  * @param resources the stored resource data
+ * @param parent the parent collection data
  */
 public record TestCollectionData(TestDatabase db, String name, Instant creation,
-    Map<String, ByteData> resources) {
+    Map<String, ByteData> resources, TestCollectionData parent) {
   /**
    * Constructs a new {@code TestCollectionData} instance with the specified name and assigns the
    * current system timestamp as the creation time.
    *
    * @param db the database to which the collection belongs, must not be null
    * @param name the name of the test collection, must not be null
+   * @param parent the parent collection data if available
    */
-  public TestCollectionData(TestDatabase db, String name) {
-    this(db, name, Instant.now(), new ConcurrentHashMap<>());
+  public TestCollectionData(TestDatabase db, String name, TestCollectionData parent) {
+    this(db, name, Instant.now(), new ConcurrentHashMap<>(), parent);
   }
 
   /**
@@ -64,7 +67,7 @@ public record TestCollectionData(TestDatabase db, String name, Instant creation,
     Objects.requireNonNull(resources);
   }
 
-  private String calculateCollectionName(TestCollection parentCollection, String child) {
+  private String calculateCollectionName(TestCollectionData parentCollection, String child) {
     final StringJoiner collectionName = new StringJoiner("/");
     if (parentCollection != null) {
       parentCollection.traverseHierarchy(collectionName::add);
@@ -73,29 +76,42 @@ public record TestCollectionData(TestDatabase db, String name, Instant creation,
     return collectionName.toString();
   }
 
-  private Predicate<Map.Entry<String, TestCollection>> calculateCollectionPattern(
+  private Predicate<Map.Entry<String, TestCollectionData>> calculateCollectionPattern(
       String collectionName) {
     final Pattern compile = Pattern.compile("^%s/([^/]+)$".formatted(collectionName));
     return entry -> compile.matcher(entry.getKey()).matches();
   }
 
-  void addCollection(TestCollection parentCollection, String child) {
+  void addCollection(TestCollectionData parentCollection, String child) {
     db.addCollection(calculateCollectionName(parentCollection, child));
   }
 
-  Collection getCollection(TestCollection parentCollection, String collectionName) {
-    return db.getCollection(calculateCollectionName(parentCollection, collectionName));
+  TestCollectionData getCollection(String collectionName) {
+    return db.getCollectionData(calculateCollectionName(this, collectionName));
   }
 
-  List<String> listCollection(TestCollection parentCollection) {
+  List<String> listCollection() {
     return db.collections()
-        .filter(calculateCollectionPattern(calculateCollectionName(parentCollection, name)))
-        .map(Map.Entry::getValue).map(TestCollection::name).toList();
+        .filter(calculateCollectionPattern(calculateCollectionName(parent, name)))
+        .map(Map.Entry::getValue).map(TestCollectionData::name).toList();
   }
 
-  int getCollectionCount(TestCollection parentCollection) {
+  int getCollectionCount() {
     return Math.toIntExact(db.collections()
-        .filter(calculateCollectionPattern(calculateCollectionName(parentCollection, name)))
-        .count());
+        .filter(calculateCollectionPattern(calculateCollectionName(parent, name))).count());
+  }
+
+  /**
+   * Traverses the hierarchy of collections, starting from the current collection up to the root
+   * collection, and applies the specified action to the name of each collection in the hierarchy.
+   *
+   * @param action A Consumer that processes the name of each collection in the hierarchy. Must not
+   *        be null.
+   */
+  void traverseHierarchy(Consumer<String> action) {
+    if (parent != null) {
+      parent.traverseHierarchy(action);
+    }
+    action.accept(name());
   }
 }

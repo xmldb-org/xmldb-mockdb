@@ -59,9 +59,13 @@ class TestDatabaseTest {
   @Test
   void getCollection() {
     db.collections().forEach(entry -> {
-      assertThat(db.getCollection("/" + entry.getKey() + "/")).isSameAs(entry.getValue())
-          .satisfies(collection -> {
-            assertThat(collection.getName()).isEqualTo("/" + entry.getKey());
+      final String name = "/" + entry.getKey();
+      assertThat(db.getCollectionData(name + "/")).isSameAs(entry.getValue()).satisfies(
+          collectionData -> assertThat(name).endsWith("/" + collectionData.name()),
+          collectionData -> {
+            try (TestCollection collection = new TestCollection(collectionData)) {
+              assertThat(collection.getName()).isEqualTo("/" + entry.getKey());
+            }
           });
     });
   }

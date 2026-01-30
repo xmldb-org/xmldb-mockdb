@@ -14,12 +14,12 @@ import static org.xmldb.api.base.ErrorCodes.INVALID_RESOURCE;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Resource;
@@ -56,7 +56,6 @@ import org.xmldb.mockdb.services.TestXUpdateQueryService;
  */
 public class TestCollection extends ConfigurableImpl implements Collection {
   private final TestCollectionData data;
-  private final TestCollection parentCollection;
   private final ServiceProviderCache serviceProviderCache =
       ServiceProviderCache.withRegistered(this::registerProviders);
   private final AtomicBoolean open;
@@ -65,12 +64,9 @@ public class TestCollection extends ConfigurableImpl implements Collection {
    * Constructs a new TestCollection instance with the specified data and parent collection.
    *
    * @param data The data associated with this collection. Must not be null.
-   * @param parent The parent collection, which may be null if this collection does not have a
-   *        parent.
    */
-  TestCollection(final TestCollectionData data, final TestCollection parent) {
-    this.data = data;
-    this.parentCollection = parent;
+  TestCollection(final TestCollectionData data) {
+    this.data = Objects.requireNonNull(data, "data must not be null");
     open = new AtomicBoolean(true);
   }
 
@@ -85,25 +81,6 @@ public class TestCollection extends ConfigurableImpl implements Collection {
     // security
     reg.add(PermissionManagementService.class, () -> new TestPermissionManagementService(this));
     reg.add(UserPrincipalLookupService.class, () -> new TestUserPrincipalLookupService(this));
-  }
-
-  /**
-   * Creates a new instance of TestCollection with the specified name.
-   *
-   * @param db the database to which the collection belongs must not be null
-   * @param name The name of the collection to be created. Must not be null or empty.
-   * @param parent The parent collection, which may be null if this collection does not have a
-   *        parent.
-   * @param initializer A Consumer instance that initializes the collection after it is created.
-   * @return A new TestCollection instance with the given name.
-   */
-  public static TestCollection create(TestDatabase db, String name, TestCollection parent,
-      Consumer<TestCollection> initializer) {
-    final TestCollection collection = new TestCollection(new TestCollectionData(db, name), parent);
-    if (initializer != null) {
-      initializer.accept(collection);
-    }
-    return collection;
   }
 
   /**
@@ -148,7 +125,7 @@ public class TestCollection extends ConfigurableImpl implements Collection {
    * @param child The name of the child collection to be added.
    */
   public void addCollection(String child) {
-    data.addCollection(this, child);
+    data.addCollection(data, child);
   }
 
   /**
@@ -157,7 +134,11 @@ public class TestCollection extends ConfigurableImpl implements Collection {
    * @return The parent collection, or {@code null} if this collection has no parent.
    */
   TestCollection parentCollection() {
-    return parentCollection;
+    final TestCollectionData parentData = data.parent();
+    if (parentData == null) {
+      return null;
+    }
+    return new TestCollection(parentData);
   }
 
   /**
@@ -169,24 +150,10 @@ public class TestCollection extends ConfigurableImpl implements Collection {
     return data.name();
   }
 
-  /**
-   * Traverses the hierarchy of collections, starting from the current collection up to the root
-   * collection, and applies the specified action to the name of each collection in the hierarchy.
-   *
-   * @param action A Consumer that processes the name of each collection in the hierarchy. Must not
-   *        be null.
-   */
-  void traverseHierarchy(Consumer<String> action) {
-    if (parentCollection != null) {
-      parentCollection.traverseHierarchy(action);
-    }
-    action.accept(name());
-  }
-
   @Override
   public final String getName() {
     final StringJoiner joiner = new StringJoiner("/", "/", "");
-    traverseHierarchy(joiner::add);
+    data.traverseHierarchy(joiner::add);
     return joiner.toString();
   }
 
@@ -202,22 +169,26 @@ public class TestCollection extends ConfigurableImpl implements Collection {
 
   @Override
   public int getChildCollectionCount() {
-    return data.getCollectionCount(parentCollection);
+    return data.getCollectionCount();
   }
 
   @Override
   public List<String> listChildCollections() {
-    return data.listCollection(parentCollection);
+    return data.listCollection();
   }
 
   @Override
   public Collection getChildCollection(String collectionName) {
-    return data.getCollection(this, collectionName);
+    final TestCollectionData childCollectionData = data.getCollection(collectionName);
+    if (childCollectionData == null) {
+      return null;
+    }
+    return new TestCollection(childCollectionData);
   }
 
   @Override
   public Collection getParentCollection() {
-    return parentCollection;
+    return parentCollection();
   }
 
   @Override
