@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -35,8 +36,10 @@ import org.xmldb.api.base.Collection;
  * @param db the database to which the collection belongs, must not be null
  * @param name the name of the test collection, must not be null
  * @param creation the creation timestamp of the test collection, must not be null
+ * @param resources the stored resource data
  */
-public record TestCollectionData(TestDatabase db, String name, Instant creation) {
+public record TestCollectionData(TestDatabase db, String name, Instant creation,
+    Map<String, ByteData> resources) {
   /**
    * Constructs a new {@code TestCollectionData} instance with the specified name and assigns the
    * current system timestamp as the creation time.
@@ -45,7 +48,7 @@ public record TestCollectionData(TestDatabase db, String name, Instant creation)
    * @param name the name of the test collection, must not be null
    */
   public TestCollectionData(TestDatabase db, String name) {
-    this(db, name, Instant.now());
+    this(db, name, Instant.now(), new ConcurrentHashMap<>());
   }
 
   /**
@@ -58,6 +61,7 @@ public record TestCollectionData(TestDatabase db, String name, Instant creation)
     if (name.isBlank() || name.contains("/")) {
       throw new IllegalArgumentException("Collection is blank or contains a slash");
     }
+    Objects.requireNonNull(resources);
   }
 
   private String calculateCollectionName(TestCollection parentCollection, String child) {

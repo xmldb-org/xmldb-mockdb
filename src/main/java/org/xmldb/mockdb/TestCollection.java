@@ -17,8 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
@@ -58,11 +57,9 @@ import org.xmldb.mockdb.services.TestXUpdateQueryService;
 public class TestCollection extends ConfigurableImpl implements Collection {
   private final TestCollectionData data;
   private final TestCollection parentCollection;
-  private final ConcurrentMap<String, Resource> resources;
   private final ServiceProviderCache serviceProviderCache =
       ServiceProviderCache.withRegistered(this::registerProviders);
-
-  private boolean closed;
+  private final AtomicBoolean open;
 
   /**
    * Constructs a new TestCollection instance with the specified data and parent collection.
@@ -74,7 +71,7 @@ public class TestCollection extends ConfigurableImpl implements Collection {
   TestCollection(final TestCollectionData data, final TestCollection parent) {
     this.data = data;
     this.parentCollection = parent;
-    resources = new ConcurrentHashMap<>();
+    open = new AtomicBoolean(true);
   }
 
   final void registerProviders(ServiceProviderCache.ProviderRegistry reg) {
@@ -124,7 +121,11 @@ public class TestCollection extends ConfigurableImpl implements Collection {
       id = createId();
     }
     R resource = createAction.apply(id, this);
-    resources.put(resource.getId(), resource);
+    try {
+      data.resources().put(resource.getId(), new ByteData(resource));
+    } catch (XMLDBException e) {
+      throw new IllegalStateException("Unexpected failure while extracting data", e);
+    }
     return resource;
   }
 
@@ -208,12 +209,12 @@ public class TestCollection extends ConfigurableImpl implements Collection {
 
   @Override
   public int getResourceCount() {
-    return resources.size();
+    return data.resources().size();
   }
 
   @Override
   public List<String> listResources() {
-    return resources.keySet().stream().toList();
+    return data.resources().keySet().stream().toList();
   }
 
   @Override
@@ -221,9 +222,9 @@ public class TestCollection extends ConfigurableImpl implements Collection {
     if (id == null || id.isBlank()) {
       id = createId();
     }
-    if (BinaryResource.class.equals(type)) {
+    if (type.isAssignableFrom(BinaryResource.class)) {
       return type.cast(new TestBinaryResource(id, this));
-    } else if (XMLResource.class.equals(type)) {
+    } else if (type.isAssignableFrom(XMLResource.class)) {
       return type.cast(new TestXMLResource(id, this));
     }
     throw new XMLDBException(INVALID_RESOURCE);
@@ -231,22 +232,24 @@ public class TestCollection extends ConfigurableImpl implements Collection {
 
   @Override
   public void removeResource(Resource res) throws XMLDBException {
-    final Resource resource = resources.remove(res.getId());
-    if (resource == null) {
+    final ByteData byteData = data.resources().remove(res.getId());
+    if (byteData == null) {
       throw new XMLDBException(INVALID_RESOURCE, "Resource not found: " + res.getId());
-    } else {
-      resource.close();
     }
   }
 
   @Override
   public void storeResource(Resource res) throws XMLDBException {
-    resources.put(res.getId(), res);
+    data.resources().put(res.getId(), new ByteData(res));
   }
 
   @Override
-  public Resource getResource(String id) {
-    return resources.get(id);
+  public Resource getResource(String id) throws XMLDBException {
+    final ByteData byteData = data.resources().get(id);
+    if (byteData == null) {
+      return null;
+    }
+    return byteData.createResource(id, this);
   }
 
   @Override
@@ -256,12 +259,12 @@ public class TestCollection extends ConfigurableImpl implements Collection {
 
   @Override
   public boolean isOpen() {
-    return !closed;
+    return open.get();
   }
 
   @Override
   public void close() {
-    closed = true;
+    open.set(false);
   }
 
   @Override
