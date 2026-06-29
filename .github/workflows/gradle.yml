@@ -36,6 +36,8 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew check
+    - name: Run TCK
+      run: ./gradlew runTck
 # enable when public
 #    - name: SonarQube
 #      if:  ${{ matrix.jdk == '21' }}

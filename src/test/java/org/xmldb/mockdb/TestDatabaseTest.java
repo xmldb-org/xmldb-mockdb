@@ -51,9 +51,10 @@ class TestDatabaseTest {
 
   @Test
   void collections() {
-    assertThat(db.collections()).hasSize(7);
-    assertThat(db.collections().map(Map.Entry::getKey)).containsExactlyInAnyOrder("db", "db/sub1",
-        "db/sub1/sub1_1", "db/sub1/sub1_2", "db/sub2", "db/sub2/sub2_1", "db/sub2/sub2_2");
+    assertThat(db.collections()).hasSize(8);
+    assertThat(db.collections().map(Map.Entry::getKey)).containsExactlyInAnyOrder("db",
+        "db/tck-tests", "db/sub1", "db/sub1/sub1_1", "db/sub1/sub1_2", "db/sub2", "db/sub2/sub2_1",
+        "db/sub2/sub2_2");
   }
 
   @Test

@@ -89,6 +89,7 @@ public class TestDatabase extends ConfigurableImpl implements Database {
     }
     collections = new HashMap<>();
     addCollection("db");
+    addCollection("db/tck-tests");
   }
 
   private String sanitizePath(final String path) {

@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoSettings;
+import org.xmldb.api.base.XMLDBException;
 
 @MockitoSettings
 class TestCollectionTest {
@@ -42,29 +43,41 @@ class TestCollectionTest {
   }
 
   @Test
-  void getChildCollectionCount() {
-    assertThat(collection.getChildCollectionCount()).isZero();
+  void getChildCollectionCount() throws XMLDBException {
+    assertThat(collection.getChildCollectionCount()).isOne();
     // add some collections
     collection.addCollection("sub1");
     collection.addCollection("sub2");
-    assertThat(collection.getChildCollectionCount()).isEqualTo(2);
+    assertThat(collection.getChildCollectionCount()).isEqualTo(3);
     // some sub-subcollections that should not be counted
     db.addCollection("db/sub1/sub1_1");
+    db.addCollection("db/sub1/sub1_2");
     db.addCollection("db/sub2/sub2_1");
-    assertThat(collection.getChildCollectionCount()).isEqualTo(2);
+    assertThat(collection.getChildCollectionCount()).isEqualTo(3);
+    var subCollection1 = collection.getChildCollection("sub1");
+    assertThat(subCollection1.getChildCollectionCount()).isEqualTo(2);
+    var subCollection2 = collection.getChildCollection("sub2");
+    assertThat(subCollection2.getChildCollectionCount()).isEqualTo(1);
   }
 
   @Test
-  void listChildCollections() {
-    assertThat(collection.listChildCollections()).isEmpty();
+  void listChildCollections() throws XMLDBException {
+    assertThat(collection.listChildCollections()).containsExactly("tck-tests");
     // add some collections
     collection.addCollection("sub1");
     collection.addCollection("sub2");
-    assertThat(collection.listChildCollections()).containsExactlyInAnyOrder("sub1", "sub2");
+    assertThat(collection.listChildCollections()).containsExactlyInAnyOrder("tck-tests", "sub1",
+        "sub2");
     // some sub-subcollections that should not be counted
     db.addCollection("db/sub1/sub1_1");
+    db.addCollection("db/sub1/sub1_2");
     db.addCollection("db/sub2/sub2_1");
-    assertThat(collection.listChildCollections()).containsExactlyInAnyOrder("sub1", "sub2");
+    assertThat(collection.listChildCollections()).containsExactlyInAnyOrder("tck-tests", "sub1",
+        "sub2");
+    var subCollection1 = collection.getChildCollection("sub1");
+    assertThat(subCollection1.listChildCollections()).containsExactlyInAnyOrder("sub1_1", "sub1_2");
+    var subCollection2 = collection.getChildCollection("sub2");
+    assertThat(subCollection2.listChildCollections()).containsExactlyInAnyOrder("sub2_1");
   }
 
   @Test

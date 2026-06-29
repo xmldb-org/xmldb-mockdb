@@ -21,3 +21,4 @@ reckon {
 rootProject.name = 'xmldb-mockdb'
 
 //includeBuild('../xmldb-api')
+//includeBuild('../xmldb-api-tck')

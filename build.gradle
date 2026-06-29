@@ -73,16 +73,17 @@ tasks.withType(JavaCompile).configureEach {
   dependsOn 'spotlessJavaApply'
 }
 
-tasks.register('runTck', JavaExec) {
+tasks.register('runTck', Test) {
   group = 'verification'
   description = 'Runs the TCK tests from the tck source set (for TCK authors)'
-  mainClass = 'org.junit.platform.console.ConsoleLauncher'
-  classpath = files(configurations.tckTests, sourceSets.test.runtimeClasspath)
-  args    'execute',
-          '--details=tree',
-          '--select-package=org.xmldb.tck.tests',
-          '--reports-dir',
-          "${layout.buildDirectory.dir('tck-reports').get().getAsFile()}"
+  useJUnitPlatform()
+  // Set classpath to include the TCK jar and test dependencies
+  classpath = configurations.tckTests + sourceSets.test.runtimeClasspath
+  // Try to use zipTree to explode the TCK jar
+  testClassesDirs = files(configurations.tckTests.files.findAll { it.name.contains('tck') }.collect { zipTree(it) })
+  filter {
+    includeTestsMatching "org.xmldb.tck.tests.*"
+  }
 }
 
 spotless {
