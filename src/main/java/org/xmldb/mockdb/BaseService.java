@@ -10,6 +10,9 @@
  */
 package org.xmldb.mockdb;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.Service;
@@ -36,6 +39,14 @@ public abstract class BaseService extends ConfigurableImpl implements Service {
 
   TestCollection collection() {
     return collection;
+  }
+
+  <T> T applyCollection(Function<TestCollection, T> action) {
+    return action.apply(collection);
+  }
+
+  void acceptCollection(Consumer<TestCollection> action) {
+    action.accept(collection);
   }
 
   @Override

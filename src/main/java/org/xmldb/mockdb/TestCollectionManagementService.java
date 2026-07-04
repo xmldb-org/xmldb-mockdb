@@ -22,33 +22,33 @@ class TestCollectionManagementService extends BaseService implements CollectionM
 
   @Override
   public Collection createCollection(String name) throws XMLDBException {
-    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
+    return applyCollection(c -> c.addCollection(name));
   }
 
   @Override
   public void removeCollection(String name) throws XMLDBException {
-    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
+    acceptCollection(c -> c.removeCollection(name));
   }
 
   @Override
   public void move(String collection, String destination, String newName) throws XMLDBException {
-    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "move is not supported.");
   }
 
   @Override
   public void moveResource(String resourcePath, String destinationPath, String newName)
       throws XMLDBException {
-    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "moveResource is not supported.");
   }
 
   @Override
   public void copyResource(String resourcePath, String destinationPath, String newName)
       throws XMLDBException {
-    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "copyResource is not supported.");
   }
 
   @Override
   public void copy(String collection, String destination, String newName) throws XMLDBException {
-    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "Namespace management is not supported.");
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED, "copy is not supported.");
   }
 }

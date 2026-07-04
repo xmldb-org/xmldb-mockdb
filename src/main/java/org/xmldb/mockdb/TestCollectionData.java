@@ -78,12 +78,19 @@ public record TestCollectionData(TestDatabase db, String name, Instant creation,
 
   private Predicate<Map.Entry<String, TestCollectionData>> calculateCollectionPattern(
       String collectionName) {
-    final Pattern compile = Pattern.compile("^%s/([^/]+)$".formatted(collectionName));
-    return entry -> compile.matcher(entry.getKey()).matches();
+    final Pattern pattern =
+        Pattern.compile("^%s\\/([^\\/]+)$".formatted(Pattern.quote(collectionName)));
+    return entry -> pattern.matcher(entry.getKey()).matches();
   }
 
-  void addCollection(TestCollectionData parentCollection, String child) {
-    db.addCollection(calculateCollectionName(parentCollection, child));
+  void addCollection(TestCollectionData parentCollection, String child,
+      Consumer<TestCollection> initializer) {
+    db.addCollection(calculateCollectionName(parentCollection, child), initializer);
+  }
+
+  void removeCollection(TestCollectionData parentCollection, String child) {
+    final String collectionName = calculateCollectionName(parentCollection, child);
+    db.removeCollections(entry -> entry.getKey().startsWith(collectionName));
   }
 
   TestCollectionData getCollection(String collectionName) {

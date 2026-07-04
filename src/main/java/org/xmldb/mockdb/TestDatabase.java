@@ -22,6 +22,7 @@ import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -148,6 +149,10 @@ public class TestDatabase extends ConfigurableImpl implements Database {
 
   Stream<Map.Entry<String, TestCollectionData>> collections() {
     return collections.entrySet().stream();
+  }
+
+  void removeCollections(Predicate<Map.Entry<String, TestCollectionData>> predicate) {
+    collections.entrySet().removeIf(predicate);
   }
 
   @Override

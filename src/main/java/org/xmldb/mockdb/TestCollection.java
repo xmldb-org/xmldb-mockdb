@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 
 import org.xmldb.api.base.Collection;
@@ -106,12 +107,12 @@ public class TestCollection extends ConfigurableImpl implements Collection {
     if (creation == null) {
       creation = Instant.now();
     }
-    if (type.isAssignableFrom(BinaryResource.class)) {
+    if (BinaryResource.class.isAssignableFrom(type)) {
       return new TestBinaryResource(id, creation, this);
-    } else if (type.isAssignableFrom(XMLResource.class)) {
+    } else if (XMLResource.class.isAssignableFrom(type)) {
       return new TestXMLResource(id, creation, this);
     }
-    throw new XMLDBException(INVALID_RESOURCE);
+    throw new XMLDBException(INVALID_RESOURCE, "Invalid resource type: " + type);
   }
 
   /**
@@ -119,8 +120,14 @@ public class TestCollection extends ConfigurableImpl implements Collection {
    *
    * @param child The name of the child collection to be added.
    */
-  public void addCollection(String child) {
-    data.addCollection(data, child);
+  public TestCollection addCollection(String child) {
+    AtomicReference<TestCollection> collectionDataAtomicReference = new AtomicReference<>();
+    data.addCollection(data, child, collectionDataAtomicReference::set);
+    return collectionDataAtomicReference.get();
+  }
+
+  void removeCollection(String name) {
+    data.removeCollection(data, name);
   }
 
   /**
